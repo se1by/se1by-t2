@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.SpawnEgg;
 
 /**
  * Created by Jonas Seibert on 12.07.2014.
@@ -33,51 +34,88 @@ public class ChestDevice implements Device {
             if (!plugin.getConversionConfig().contains(itemName)) {
                 continue;
             }
-            String[] split = plugin.getConversionConfig().getString(itemName).split(";");
-            if (split.length != 2 || !Utils.isFloat(split[1])) {
-                plugin.getLogger().warning("Illegal entry for " + itemName + "!");
-                continue;
-            }
-            ItemStack output;
-            try {
-                output = new ItemStack(Material.valueOf(split[0].toUpperCase()), 0);
-            } catch (IllegalArgumentException e) {
-                plugin.getLogger().warning("Illegal entry for " + itemName + "(missing/wrong material)!");
-                continue;
-            }
-            float cost = Float.valueOf(split[1]);
-            while (fPower >= cost && item.getAmount() > 0) {
-                fPower -= cost;
-                item.setAmount(item.getAmount() -1);
-                output.setAmount(output.getAmount() +1);
-            }
-            if (item.getAmount() <= 0) {
-                chest.getInventory().setItem(i, output);
+            if (itemName.equals("monster_egg")) {
+                fPower = spawn(item, itemName, fPower, i);
+            } else if (itemName.equals("dragon_egg")) {
+                fPower = spawnDragon(item, itemName, fPower, i);
             } else {
-                chest.getInventory().setItem(i, item);
-                for (int x = 0; x < chest.getInventory().getSize(); x++) {
-                    //empty slot
-                    if (chest.getInventory().getItem(x) == null || chest.getInventory().getItem(x).getType().equals(Material.AIR)) {
-                        chest.getInventory().setItem(x, output);
-                        return;
-                    }
-                    //Same type
-                    if (chest.getInventory().getItem(x).getType().equals(output.getType())) {
-                        if (output.getMaxStackSize() - chest.getInventory().getItem(x).getAmount() >= output.getAmount()) {
-                            output.setAmount(output.getAmount() + chest.getInventory().getItem(x).getAmount());
-                            chest.getInventory().setItem(x, output);
-                            return;
-                        } else {
-                            output.setAmount(output.getAmount() + chest.getInventory().getItem(x).getAmount() - output.getMaxStackSize());
-                            chest.getInventory().setItem(x, new ItemStack(output.getType(), output.getMaxStackSize()));
-                        }
-                    }
+                fPower = convert(item, itemName, fPower, i);
+            }
+        }
+    }
+
+    private float convert(ItemStack item, String itemName, float fPower, int index) {
+        String[] split = plugin.getConversionConfig().getString(itemName).split(";");
+        if (split.length != 2 || !Utils.isFloat(split[1])) {
+            plugin.getLogger().warning("Illegal entry for " + itemName + "!");
+            return fPower;
+        }
+        ItemStack output;
+        try {
+            output = new ItemStack(Material.valueOf(split[0].toUpperCase()), 0);
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("Illegal entry for " + itemName + "(missing/wrong material)!");
+            return fPower;
+        }
+        float cost = Float.valueOf(split[1]);
+        while (fPower >= cost && item.getAmount() > 0) {
+            fPower -= cost;
+            item.setAmount(item.getAmount() - 1);
+            output.setAmount(output.getAmount() + 1);
+        }
+
+        //This monster puts the items back to the chest^^
+        chest.getInventory().setItem(index, item);
+        int slot = -1;
+        for (int x = 0; x < chest.getInventory().getSize(); x++) {
+            //empty slot
+            if (chest.getInventory().getItem(x) == null || chest.getInventory().getItem(x).getType().equals(Material.AIR)) {
+                //We want the first free slot
+                if (slot == -1) {
+                    slot = x;
                 }
-                if (output.getAmount() > 0) {
-                    chest.getWorld().dropItem(chest.getLocation(), output);
+                continue;
+            }
+            //Same type
+            if (chest.getInventory().getItem(x).getType().equals(output.getType())) {
+                if (output.getMaxStackSize() - chest.getInventory().getItem(x).getAmount() >= output.getAmount()) {
+                    output.setAmount(output.getAmount() + chest.getInventory().getItem(x).getAmount());
+                    chest.getInventory().setItem(x, output);
+                    return fPower;
+                } else {
+                    output.setAmount(output.getAmount() + chest.getInventory().getItem(x).getAmount() - output.getMaxStackSize());
+                    chest.getInventory().setItem(x, new ItemStack(output.getType(), output.getMaxStackSize()));
                 }
             }
         }
+        if (output.getAmount() > 0) {
+            if (slot != -1) {
+                chest.getInventory().setItem(slot, output);
+            } else {
+                chest.getWorld().dropItem(chest.getLocation(), output);
+            }
+        }
+        return fPower;
+    }
+
+    private float spawn(ItemStack item, String itemName, float fPower, int index) {
+        SpawnEgg se = (SpawnEgg) item.getData();
+        String s = plugin.getConversionConfig().getString(itemName + "." + se.getSpawnedType().toString().toLowerCase());
+        float cost = Float.valueOf(s);
+        while (fPower >= cost && item.getAmount() > 0) {
+            fPower -= cost;
+            chest.getWorld().spawn(chest.getLocation().add(0, 2, 0), se.getSpawnedType().getEntityClass());
+            item.setAmount(item.getAmount() -1);
+        }
+        if (item.getAmount() > 0) {
+            chest.getInventory().setItem(index, item);
+        }
+        return fPower;
+    }
+
+    private float spawnDragon(ItemStack item, String itemName, float fPower, int index) {
+        //TODO: add dragon spawning!!!!111!!oneeleven!
+        return fPower;
     }
 
 
