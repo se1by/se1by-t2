@@ -29,7 +29,8 @@ Usage
 -----
 
 1. Install plugin
-2. Do things with it
+2. Add stuff in conversion.yml
+3. Have fun
 
 <!-- Hi, se1by! This is the default README for every ten.java submission. -->
 <!-- We encourage you to edit this README with some information about your submission – keep in mind you'll be scored on documentation! -->
