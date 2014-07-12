@@ -26,20 +26,21 @@ public class ChestDevice implements Device {
     public void power() {
         float fPower = power;
         for (int i = 0; i < chest.getInventory().getSize(); i++) {
-            //Does the conversionConfig contain an entry for that item?
             ItemStack item = chest.getInventory().getItem(i);
+            if (item == null || item.getType().equals(Material.AIR)) continue;
             String itemName = item.getType().toString().toLowerCase();
+            //Does the conversionConfig contain an entry for that item?
             if (!plugin.getConversionConfig().contains(itemName)) {
                 continue;
             }
             String[] split = plugin.getConversionConfig().getString(itemName).split(";");
-            if (split.length != 2 || Utils.isFloat(split[1])) {
+            if (split.length != 2 || !Utils.isFloat(split[1])) {
                 plugin.getLogger().warning("Illegal entry for " + itemName + "!");
                 continue;
             }
             ItemStack output;
             try {
-                output = new ItemStack(Material.valueOf(split[0]));
+                output = new ItemStack(Material.valueOf(split[0].toUpperCase()), 0);
             } catch (IllegalArgumentException e) {
                 plugin.getLogger().warning("Illegal entry for " + itemName + "(missing/wrong material)!");
                 continue;
@@ -50,26 +51,35 @@ public class ChestDevice implements Device {
                 item.setAmount(item.getAmount() -1);
                 output.setAmount(output.getAmount() +1);
             }
-            chest.getInventory().setItem(i, output);
-            if (item.getAmount() > 0) {
-                int slot = getFreeSlot();
-                if (slot == -1) {
-                    chest.getWorld().dropItem(chest.getLocation(), item);
-                } else {
-                    chest.getInventory().setItem(slot, item);
+            if (item.getAmount() <= 0) {
+                chest.getInventory().setItem(i, output);
+            } else {
+                chest.getInventory().setItem(i, item);
+                for (int x = 0; x < chest.getInventory().getSize(); x++) {
+                    //empty slot
+                    if (chest.getInventory().getItem(x) == null || chest.getInventory().getItem(x).getType().equals(Material.AIR)) {
+                        chest.getInventory().setItem(x, output);
+                        return;
+                    }
+                    //Same type
+                    if (chest.getInventory().getItem(x).getType().equals(output.getType())) {
+                        if (output.getMaxStackSize() - chest.getInventory().getItem(x).getAmount() >= output.getAmount()) {
+                            output.setAmount(output.getAmount() + chest.getInventory().getItem(x).getAmount());
+                            chest.getInventory().setItem(x, output);
+                            return;
+                        } else {
+                            output.setAmount(output.getAmount() + chest.getInventory().getItem(x).getAmount() - output.getMaxStackSize());
+                            chest.getInventory().setItem(x, new ItemStack(output.getType(), output.getMaxStackSize()));
+                        }
+                    }
+                }
+                if (output.getAmount() > 0) {
+                    chest.getWorld().dropItem(chest.getLocation(), output);
                 }
             }
         }
     }
 
-    private int getFreeSlot() {
-        for (int i = 0; i < chest.getInventory().getSize(); i++) {
-            if (chest.getInventory().getItem(i) == null) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     @Override
     public Location getLocation() {
