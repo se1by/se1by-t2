@@ -9,6 +9,9 @@ import org.json.simple.parser.ParseException;
 /**
  * Created by Jonas Seibert on 12.07.2014.
  * All rights reserved.
+ *
+ * A format to save locations in. Safe as it doesn't rely on a bukkit world.
+ * Uses JSON for parsing.
  */
 public class SafeLocation {
     private int x, y , z;
@@ -47,6 +50,11 @@ public class SafeLocation {
         return jsonObject.toJSONString();
     }
 
+    /**
+     * Reads a SafeLocation from a String
+     * @param s The string containing the safeLocation
+     * @return A safeLocation
+     */
     public static SafeLocation fromString(String s) {
         try {
             JSONObject jsonObject = (JSONObject) parser.parse(s);

@@ -6,19 +6,21 @@ import org.bukkit.block.Furnace;
 /**
  * Created by Jonas Seibert on 12.07.2014.
  * All rights reserved.
+ *
+ * A furnace device receives cooking power from electricity!
+ * Up to the equivalent of a lava bucket
  */
-public class FurnanceDevice implements Device {
+public class FurnaceDevice implements Device {
     private Furnace furnace;
     private int power;
 
-    public FurnanceDevice(Furnace furnace, int power) {
+    public FurnaceDevice(Furnace furnace, int power) {
         this.furnace = furnace;
         this.power = power;
     }
 
     @Override
     public void power() {
-        System.out.println("powering with " + (power * 2000) + "fuel");
         furnace.setBurnTime((short) (power * 2000));
         furnace.update();
     }

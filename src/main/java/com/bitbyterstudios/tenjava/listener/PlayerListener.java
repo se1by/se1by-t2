@@ -47,6 +47,11 @@ public class PlayerListener implements Listener {
         }
     }
 
+    /**
+     * Checks if the block is a lightning rod.
+     * @param block The block to check. Has to be the top block (brewing stand)
+     * @return True if it is a lightning rod, false if not
+     */
     private boolean isLightningRod(Block block) {
         return (block.getType().equals(Material.BREWING_STAND) &&
                 block.getRelative(0, -1, 0).getType().equals(Material.COBBLE_WALL) &&
@@ -54,6 +59,10 @@ public class PlayerListener implements Listener {
                 plugin.getWorldConfig(block.getWorld()).getStringList("rods").contains(new SafeLocation(block.getLocation()).toString());
     }
 
+    /**
+     * Saves the lightning rod in the world's config
+     * @param loc The location of the lightning rod
+     */
     private void saveLightningRod(Location loc) {
         List<String> list = plugin.getWorldConfig(loc.getWorld()).getStringList("rods");
         list.add(new SafeLocation(loc).toString());
@@ -61,6 +70,10 @@ public class PlayerListener implements Listener {
         plugin.saveWorldConfig(loc.getWorld());
     }
 
+    /**
+     * Deletes a lightning rod from the world's config
+     * @param loc The location of the lightning rod to be deleted
+     */
     private void deleteLightningRod(Location loc) {
         List<String> list = plugin.getWorldConfig(loc.getWorld()).getStringList("rods");
         list.remove(new SafeLocation(loc).toString());

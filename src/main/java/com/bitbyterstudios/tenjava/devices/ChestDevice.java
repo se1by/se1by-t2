@@ -11,6 +11,10 @@ import org.bukkit.material.SpawnEgg;
 /**
  * Created by Jonas Seibert on 12.07.2014.
  * All rights reserved.
+ *
+ * A chest device is a chest next to a power line. If it contains items mentioned in conversion.yml,
+ * it will convert them at the cost mentioned in conversion.yml. If it contains spawn eggs mentioned in
+ * conversion.yml, it will spawn them at that cost.
  */
 public class ChestDevice implements Device {
     private Zapped plugin;
@@ -44,6 +48,14 @@ public class ChestDevice implements Device {
         }
     }
 
+    /**
+     * Converts the item to the type as in conversion.yml
+     * @param item The original item
+     * @param itemName The name of the item
+     * @param fPower current power that can be used
+     * @param index The inventory index
+     * @return power left after converting
+     */
     private float convert(ItemStack item, String itemName, float fPower, int index) {
         String[] split = plugin.getConversionConfig().getString(itemName).split(";");
         if (split.length != 2 || !Utils.isFloat(split[1])) {
@@ -98,6 +110,14 @@ public class ChestDevice implements Device {
         return fPower;
     }
 
+    /**
+     * Spawns a monster. Cost defined in conversion.yml
+     * @param item The original item (monster egg)
+     * @param itemName The name of the item
+     * @param fPower current power that can be used
+     * @param index The inventory index
+     * @return power left after spawning
+     */
     private float spawn(ItemStack item, String itemName, float fPower, int index) {
         SpawnEgg se = (SpawnEgg) item.getData();
         String s = plugin.getConversionConfig().getString(itemName + "." + se.getSpawnedType().toString().toLowerCase());
@@ -109,10 +129,20 @@ public class ChestDevice implements Device {
         }
         if (item.getAmount() > 0) {
             chest.getInventory().setItem(index, item);
+        } else {
+            chest.getInventory().setItem(index, null);
         }
         return fPower;
     }
 
+    /**
+     * We'll do that later...
+     * @param item
+     * @param itemName
+     * @param fPower
+     * @param index
+     * @return
+     */
     private float spawnDragon(ItemStack item, String itemName, float fPower, int index) {
         //TODO: add dragon spawning!!!!111!!oneeleven!
         return fPower;

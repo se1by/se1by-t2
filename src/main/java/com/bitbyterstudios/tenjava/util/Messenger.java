@@ -10,6 +10,8 @@ import java.io.File;
 /**
  * Created by Jonas Seibert on 12.07.2014.
  * All rights reserved.
+ *
+ * Formats messages.
  */
 public class Messenger {
 

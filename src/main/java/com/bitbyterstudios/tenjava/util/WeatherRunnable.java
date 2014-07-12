@@ -34,6 +34,8 @@ public class WeatherRunnable extends BukkitRunnable {
 
             //Just a little optical gimmick, not actually needed
             world.strikeLightningEffect(safeLocation.toLocation());
+
+            //Check all the cables and power them!
             for (Block b : getCables(getGroundBlock(safeLocation.toLocation()))) {
                 power(b);
                 Collection<Device> devices = getDevices(b, new HashMap<String, Device>(), 10, BlockFace.SELF).values();
@@ -44,6 +46,11 @@ public class WeatherRunnable extends BukkitRunnable {
         }
     }
 
+    /**
+     * Gets the lowest lightning rod block
+     * @param loc The location to check
+     * @return The lowest block
+     */
     private Block getGroundBlock(Location loc) {
         while (loc.getBlock().getType().equals(Material.COBBLE_WALL) || loc.getBlock().getType().equals(Material.BREWING_STAND)) {
             loc.setY(loc.getY() -1);
@@ -52,6 +59,11 @@ public class WeatherRunnable extends BukkitRunnable {
         return loc.getBlock();
     }
 
+    /**
+     * Gets all cables (redstone wires) around a block
+     * @param b The block to check
+     * @return All the cables
+     */
     private List<Block> getCables(Block b) {
         List<Block> cables = new ArrayList<>();
         if (b.getRelative(BlockFace.EAST).getType().equals(Material.REDSTONE_WIRE)) {
@@ -69,6 +81,15 @@ public class WeatherRunnable extends BukkitRunnable {
         return cables;
     }
 
+    /**
+     * Recursive function to get all connected devices.
+     * Uses a hashmap so be don't get double entries.
+     * @param b The block to check
+     * @param list A list of all devices
+     * @param power The power left.
+     * @param from Blockface we come from.
+     * @return All connected devices.
+     */
     private HashMap<String, Device> getDevices(Block b, HashMap<String, Device> list, int power, BlockFace from) {
         if (power == 0) return list;
         if (Utils.isDevice(b) && !list.containsKey(b.getLocation().toString())) { //Don't kill me for that quickfix :o
@@ -92,6 +113,10 @@ public class WeatherRunnable extends BukkitRunnable {
         return list;
     }
 
+    /**
+     * Powers the cables(redstone wires) for 2 ticks
+     * @param b the cable block.
+     */
     private void power(final Block b) {
         final Material mat = b.getRelative(BlockFace.DOWN, 2).getType();
         b.getRelative(BlockFace.DOWN, 2).setType(Material.REDSTONE_TORCH_ON);
