@@ -22,15 +22,14 @@ public class WeatherListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onWeatherChange(WeatherChangeEvent event) {
         if (event.toWeatherState()) {
-            if (plugin.getWeatherRunnables().get(event.getWorld().getName()) == null) {
-                WeatherRunnable weatherRunnable = new WeatherRunnable(plugin, event.getWorld());
-                plugin.getWeatherRunnables().put(event.getWorld().getName(), weatherRunnable);
-            }
+            WeatherRunnable weatherRunnable = new WeatherRunnable(plugin, event.getWorld());
+            plugin.getWeatherRunnables().put(event.getWorld().getName(), weatherRunnable);
             long interval = plugin.getWorldConfig(event.getWorld()).getLong("interval");
             plugin.getWeatherRunnables().get(event.getWorld().getName()).runTaskTimer(plugin, interval*20, interval*20);
         } else {
             if (plugin.getWeatherRunnables().get(event.getWorld().getName()) != null) {
                 plugin.getWeatherRunnables().get(event.getWorld().getName()).cancel();
+
             }
         }
     }
