@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.tenjava.entries.se1by.t2</groupId> <!-- you're welcome to change this -->
-	<artifactId>se1by-t2</artifactId>
+	<groupId>com.bitbyterstudios.tenjava</groupId> <!-- you're welcome to change this -->
+	<artifactId>Zapped</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ten.java 2014 July</name>
-	<description>Contest entry for ten.java 2014 July</description>
+	<description>Contest entry for ten.java 2014 July(se1by)</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,8 +38,8 @@
 				<configuration>
 					<!-- Per the rules at http://git.io/lAJgzQ, you're free to change
 					     "1.6" to "1.7" or "1.8" if you wish. This will not impact your score. -->
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 		</plugins>
