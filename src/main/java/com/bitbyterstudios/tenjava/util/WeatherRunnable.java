@@ -9,9 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Jonas Seibert on 12.07.2014.
@@ -38,10 +36,9 @@ public class WeatherRunnable extends BukkitRunnable {
             world.strikeLightningEffect(safeLocation.toLocation());
             for (Block b : getCables(getGroundBlock(safeLocation.toLocation()))) {
                 power(b);
-                List<Device> devices = getDevices(b, new ArrayList<Device>(), 10, BlockFace.SELF);
+                Collection<Device> devices = getDevices(b, new HashMap<String, Device>(), 10, BlockFace.SELF).values();
                 for (Device device : devices) {
                     device.power();
-                    System.out.println("found device at " + device.getLocation().toString());
                 }
             }
         }
@@ -72,24 +69,23 @@ public class WeatherRunnable extends BukkitRunnable {
         return cables;
     }
 
-    private List<Device> getDevices(Block b, List<Device> list, int power, BlockFace from) {
+    private HashMap<String, Device> getDevices(Block b, HashMap<String, Device> list, int power, BlockFace from) {
         if (power == 0) return list;
-        if (Utils.isDevice(b)) { //TODO: make sure we add them ONCE
-            list.add(Utils.getDevice(b, power));
+        if (Utils.isDevice(b) && !list.containsKey(b.getLocation().toString())) { //Don't kill me for that quickfix :o
+            list.put(b.getLocation().toString(), Utils.getDevice(b, power));
         } else {
-            System.out.println(b.getType() + " at " + b.getLocation().toString() + " is not a device!");
             if (b.getType().equals(Material.REDSTONE_WIRE)) {
                 if (!from.equals(BlockFace.EAST)) {
-                    list.addAll(getDevices(b.getRelative(BlockFace.EAST), list, power-1, Utils.invert(BlockFace.EAST)));
+                    list.putAll(getDevices(b.getRelative(BlockFace.EAST), list, power-1, Utils.invert(BlockFace.EAST)));
                 }
                 if (!from.equals(BlockFace.NORTH)) {
-                    list.addAll(getDevices(b.getRelative(BlockFace.NORTH), list, power-1, Utils.invert(BlockFace.NORTH)));
+                    list.putAll(getDevices(b.getRelative(BlockFace.NORTH), list, power-1, Utils.invert(BlockFace.NORTH)));
                 }
                 if (!from.equals(BlockFace.SOUTH)) {
-                    list.addAll(getDevices(b.getRelative(BlockFace.SOUTH), list, power-1, Utils.invert(BlockFace.SOUTH)));
+                    list.putAll(getDevices(b.getRelative(BlockFace.SOUTH), list, power-1, Utils.invert(BlockFace.SOUTH)));
                 }
                 if (!from.equals(BlockFace.WEST)) {
-                    list.addAll(getDevices(b.getRelative(BlockFace.WEST), list, power-1, Utils.invert(BlockFace.WEST)));
+                    list.putAll(getDevices(b.getRelative(BlockFace.WEST), list, power-1, Utils.invert(BlockFace.WEST)));
                 }
             }
         }

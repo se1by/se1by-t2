@@ -18,7 +18,8 @@ public class FurnanceDevice implements Device {
 
     @Override
     public void power() {
-        furnace.setBurnTime((short) (power * 100));
+        System.out.println("powering with " + (power * 2000) + "fuel");
+        furnace.setBurnTime((short) (power * 2000));
         furnace.update();
     }
 
