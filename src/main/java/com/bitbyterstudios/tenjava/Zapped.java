@@ -17,6 +17,8 @@ public class Zapped extends JavaPlugin {
 
     private HashMap<String, YamlConfiguration> worldConfigs;
     private HashMap<String, File> worldConfigFiles;
+    private YamlConfiguration conversionConfig;
+    private File conversionConfigFile;
 
     private HashMap<String, WeatherRunnable> weatherRunnables;
 
@@ -25,6 +27,7 @@ public class Zapped extends JavaPlugin {
     @Override
     public void onEnable() {
         saveResource("messages.yml", false);
+        saveResource("conversion.yml", false);
         messenger = new Messenger(this);
         worldConfigs = new HashMap<>();
         worldConfigFiles = new HashMap<>();
@@ -69,10 +72,32 @@ public class Zapped extends JavaPlugin {
     public void loadWorldConfig(String world) {
         if (Bukkit.getWorld(world) != null) {
             File file = new File(getDataFolder(), world + ".yml");
+            boolean empty = !file.exists();
             worldConfigFiles.put(world, file);
             worldConfigs.put(world, YamlConfiguration.loadConfiguration(file));
+            if (empty) {
+                worldConfigs.get(world).set("chance", 0.2);
+                worldConfigs.get(world).set("interval", 10);
+                saveWorldConfig(world);
+            }
         } else {
             throw new IllegalArgumentException("World " + world + " doesn't exists or isn't loaded!");
+        }
+    }
+
+    public YamlConfiguration getConversionConfig() {
+        if (conversionConfig == null) {
+            conversionConfigFile = new File(getDataFolder(), "conversion.yml");
+            conversionConfig = YamlConfiguration.loadConfiguration(conversionConfigFile);
+        }
+        return conversionConfig;
+    }
+
+    public void saveConversionConfig() {
+        try {
+            conversionConfig.save(conversionConfigFile);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

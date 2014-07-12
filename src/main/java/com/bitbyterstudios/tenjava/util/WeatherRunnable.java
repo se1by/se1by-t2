@@ -72,7 +72,7 @@ public class WeatherRunnable extends BukkitRunnable {
     private HashMap<String, Device> getDevices(Block b, HashMap<String, Device> list, int power, BlockFace from) {
         if (power == 0) return list;
         if (Utils.isDevice(b) && !list.containsKey(b.getLocation().toString())) { //Don't kill me for that quickfix :o
-            list.put(b.getLocation().toString(), Utils.getDevice(b, power));
+            list.put(b.getLocation().toString(), Utils.getDevice(b, power, plugin));
         } else {
             if (b.getType().equals(Material.REDSTONE_WIRE)) {
                 if (!from.equals(BlockFace.EAST)) {

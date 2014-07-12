@@ -1,10 +1,13 @@
 package com.bitbyterstudios.tenjava.util;
 
+import com.bitbyterstudios.tenjava.Zapped;
+import com.bitbyterstudios.tenjava.devices.ChestDevice;
 import com.bitbyterstudios.tenjava.devices.Device;
 import com.bitbyterstudios.tenjava.devices.FurnanceDevice;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 
 /**
  * Created by Jonas Seibert on 12.07.2014.
@@ -13,17 +16,21 @@ import org.bukkit.block.BlockFace;
 public class Utils {
 
     public static boolean isDevice(Block b) {
-        if (b.getType().equals(Material.FURNACE)) {
-            return true;
+        switch (b.getType()) {
+            case FURNACE:
+            case CHEST:
+                return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
-    public static Device getDevice(Block b, int power) {
+    public static Device getDevice(Block b, int power, Zapped plugin) {
         if (!isDevice(b)) return null;
         if (b.getType().equals(Material.FURNACE)) {
             return new FurnanceDevice((org.bukkit.block.Furnace) b.getState(), power);
+        } else if (b.getType().equals(Material.CHEST)) {
+            return new ChestDevice((Chest) b.getState(), power, plugin);
         }
         return null;
     }
@@ -36,5 +43,14 @@ public class Utils {
             case WEST: return BlockFace.WEST;
             default: return null;
         }
+    }
+
+    public static boolean isFloat(String s) {
+        try {
+            Float.valueOf(s);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
 }
