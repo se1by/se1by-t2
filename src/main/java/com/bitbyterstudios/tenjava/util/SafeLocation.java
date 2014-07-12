@@ -54,8 +54,8 @@ public class SafeLocation {
                     || !jsonObject.containsKey("world")) {
                 throw new IllegalArgumentException("Provided string is missing some keys!");
             }
-            return new SafeLocation((Integer) jsonObject.get("x"), (Integer) jsonObject.get("y"),
-                    (Integer) jsonObject.get("z"), (String) jsonObject.get("world"));
+            return new SafeLocation(((Long) jsonObject.get("x")).intValue(), ((Long) jsonObject.get("y")).intValue(),
+                    ((Long) jsonObject.get("z")).intValue(), (String) jsonObject.get("world"));
         } catch (ParseException e) {
             e.printStackTrace();
         }

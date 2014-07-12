@@ -1,0 +1,2 @@
+interval: 20 #how often should we send a lightning (or not, based on chance)?
+chance: 0.5 #Chance to hit a lightning rod in an interval

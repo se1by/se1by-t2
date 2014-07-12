@@ -47,6 +47,7 @@
                 <configuration>
                     <tasks>
                         <copy file="target/${project.build.finalName}.jar" tofile="testserver/plugins/${project.build.finalName}.jar"/>
+                        <delete file="testserver/plugins/${project.build.finalName}/messages.yml" />
                     </tasks>
                 </configuration>
                 <executions>

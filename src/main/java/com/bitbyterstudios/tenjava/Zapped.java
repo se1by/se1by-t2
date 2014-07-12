@@ -1,7 +1,9 @@
 package com.bitbyterstudios.tenjava;
 
 import com.bitbyterstudios.tenjava.listener.PlayerListener;
+import com.bitbyterstudios.tenjava.listener.WeatherListener;
 import com.bitbyterstudios.tenjava.util.Messenger;
+import com.bitbyterstudios.tenjava.util.WeatherRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,13 +18,20 @@ public class Zapped extends JavaPlugin {
     private HashMap<String, YamlConfiguration> worldConfigs;
     private HashMap<String, File> worldConfigFiles;
 
+    private HashMap<String, WeatherRunnable> weatherRunnables;
+
     private Messenger messenger;
 
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         saveResource("messages.yml", false);
         messenger = new Messenger(this);
+        worldConfigs = new HashMap<>();
+        worldConfigFiles = new HashMap<>();
+        weatherRunnables = new HashMap<>();
+
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new WeatherListener(this), this);
     }
 
     public Messenger getMessenger() {
@@ -67,4 +76,7 @@ public class Zapped extends JavaPlugin {
         }
     }
 
+    public HashMap<String, WeatherRunnable> getWeatherRunnables() {
+        return weatherRunnables;
+    }
 }

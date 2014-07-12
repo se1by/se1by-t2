@@ -6,4 +6,5 @@ package com.bitbyterstudios.tenjava.util;
  */
 public class MessagingKeys {
     public static final String LIGHTNINGROD_CREATED = "lightningrod_created";
+    public static final String LIGHTNINGROD_DESTROYED = "lightningrod_destroyed";
 }
